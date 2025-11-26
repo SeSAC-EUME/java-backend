@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -55,10 +56,15 @@ public class SecurityConfiguration {
             .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin)) // H2 콘솔을 위한 iframe 허용
             .authorizeHttpRequests(auth -> {
                     auth.requestMatchers(HttpMethod.GET, "/").permitAll();
-                    auth.requestMatchers(HttpMethod.GET, "/login").permitAll();
+
                     // OAuth2 로그인 엔드포인트 허용 (Google, Kakao, Naver)
                     auth.requestMatchers(HttpMethod.GET, "/oauth2/authorization/**").permitAll();
                     auth.requestMatchers(HttpMethod.GET, "/login/oauth2/code/**").permitAll();
+
+                    // EumeUser API 허용
+                    auth.requestMatchers(HttpMethod.POST, "/api/users/logout").authenticated();
+                    auth.requestMatchers(HttpMethod.GET, "/api/users/me").authenticated();
+                    auth.requestMatchers(HttpMethod.PUT, "/api/users/me").authenticated();
 
                     // Swagger UI 경로 허용 (기본 생성 문서)
                     auth.requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**", "/favicon.ico").permitAll();

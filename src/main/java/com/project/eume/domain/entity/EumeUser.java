@@ -1,6 +1,6 @@
 package com.project.eume.domain.entity;
 
-import com.project.eume.domain.enums.BackGroundTheme;
+import com.project.eume.domain.dto.request.EumeUserUpdateRequest;
 import com.project.eume.domain.enums.BackgroundTheme;
 import com.project.eume.domain.enums.LoginPlatform;
 import com.project.eume.domain.enums.UserStatus;
@@ -15,7 +15,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.UUID;
+import static java.util.Objects.isNull;
 
 @Entity
 @Getter
@@ -102,5 +102,22 @@ public class EumeUser {
             .loginFailCount(0)
             .backgroundTheme(BackgroundTheme.DEFAULT)
             .build();
+    }
+
+    /**
+     * 사용자 정보 업데이트
+     *
+     * @param request    업데이트 요청 DTO
+     * @param newSigungu 새로운 시군구 정보
+     */
+    public void update(EumeUserUpdateRequest request, Sigungu newSigungu) {
+        if (!isNull(request.userName())) this.userName = request.userName();
+        if (!isNull(request.nickName())) this.nickname = request.nickName();
+        if (!isNull(request.profileImage())) this.profileImage = request.profileImage();
+        if (!isNull(newSigungu)) this.sigungu = newSigungu;
+        if (!isNull(request.birthDate())) this.birthDate = request.birthDate();
+        if (!isNull(request.gender())) this.gender = request.gender();
+        if (!isNull(request.phone())) this.phone = request.phone();
+        if (!isNull(request.backgroundTheme())) this.backgroundTheme = request.backgroundTheme();
     }
 }
