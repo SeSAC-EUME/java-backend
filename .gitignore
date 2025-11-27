@@ -47,3 +47,8 @@ src/main/resources/application-local.yaml
 
 ### DB ###
 postgres_data
+
+.serena
+AGENTS.md
+CLAUDE.md
+.mcp.json
