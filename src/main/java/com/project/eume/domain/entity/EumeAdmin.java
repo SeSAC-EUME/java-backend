@@ -62,4 +62,33 @@ public class EumeAdmin {
     @UpdateTimestamp
     @Column(nullable = false)
     private LocalDateTime updatedAt;
+
+    /**
+     * 로그인 성공 시 호출
+     */
+    public void loginSuccess() {
+        this.lastLoginDate = LocalDateTime.now();
+        this.loginFailCount = 0;
+    }
+
+    /**
+     * 로그인 실패 시 호출
+     */
+    public void loginFail() {
+        this.loginFailCount++;
+    }
+
+    /**
+     * 계정 잠금 여부 확인 (5회 이상 실패 시)
+     */
+    public boolean isLocked() {
+        return this.loginFailCount >= 5;
+    }
+
+    /**
+     * 활성화 여부 확인
+     */
+    public boolean isActive() {
+        return "ACTIVE".equals(this.adminStatus);
+    }
 }
