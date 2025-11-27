@@ -7,7 +7,11 @@ public enum AdminErrorCode implements ErrorCode {
     INVALID_PASSWORD(HttpStatus.UNAUTHORIZED, "AD_0002", "비밀번호가 일치하지 않습니다"),
     DEACTIVATED_ADMIN(HttpStatus.FORBIDDEN, "AD_0003", "비활성화된 관리자 계정입니다"),
     ACCOUNT_LOCKED(HttpStatus.LOCKED, "AD_0004", "로그인 실패 횟수 초과로 계정이 잠겼습니다"),
-    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "AD_0005", "사용자를 찾을 수 없습니다");
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "AD_0005", "사용자를 찾을 수 없습니다"),
+    INVALID_SIGUNGU(HttpStatus.BAD_REQUEST, "AD_0006", "소속 기관이 일치하지 않습니다"),
+    SIGUNGU_NOT_FOUND(HttpStatus.NOT_FOUND, "AD_0007", "존재하지 않는 기관입니다"),
+    DUPLICATE_LOGIN_ID(HttpStatus.CONFLICT, "AD_0008", "이미 사용 중인 로그인 ID입니다"),
+    DUPLICATE_EMAIL(HttpStatus.CONFLICT, "AD_0009", "이미 사용 중인 이메일입니다");
 
     private final HttpStatus httpStatus;
     private final String errorCode;

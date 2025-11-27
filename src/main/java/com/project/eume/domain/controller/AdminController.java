@@ -1,11 +1,14 @@
 package com.project.eume.domain.controller;
 
 import com.project.eume.domain.dto.request.AdminLoginRequest;
+import com.project.eume.domain.dto.request.AdminRegisterRequest;
 import com.project.eume.domain.dto.response.*;
 import com.project.eume.domain.entity.EumeUser;
+import com.project.eume.domain.entity.Sigungu;
 import com.project.eume.domain.entity.UserEmotion;
 import com.project.eume.domain.service.AdminSearchService;
 import com.project.eume.domain.service.AdminService;
+import com.project.eume.domain.service.SigunguSearchService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
@@ -21,6 +24,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -31,11 +35,41 @@ public class AdminController {
 
     private final AdminService adminService;
     private final AdminSearchService adminSearchService;
+    private final SigunguSearchService sigunguSearchService;
+
+    @GetMapping("/orgs")
+    @Operation(summary = "소속 기관 목록 조회", description = "관리자 로그인 화면에서 사용할 기관(시군구) 목록을 조회합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공")
+    })
+    public ResponseEntity<List<AdminOrgResponse>> getOrgs() {
+        List<Sigungu> sigungus = sigunguSearchService.findAll();
+        List<AdminOrgResponse> responses = sigungus.stream()
+                .map(AdminOrgResponse::from)
+                .toList();
+        return ResponseEntity.ok(responses);
+    }
+
+    @PostMapping("/register")
+    @Operation(summary = "관리자 회원가입", description = "새 관리자 계정을 등록합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "회원가입 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 (필수 필드 누락)"),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 기관"),
+            @ApiResponse(responseCode = "409", description = "중복된 로그인 ID 또는 이메일")
+    })
+    public ResponseEntity<AdminRegisterResponse> register(
+            @Valid @RequestBody AdminRegisterRequest request
+    ) {
+        AdminRegisterResponse response = adminService.register(request);
+        return ResponseEntity.ok(response);
+    }
 
     @PostMapping("/login")
-    @Operation(summary = "관리자 로그인", description = "관리자 ID/PW로 로그인합니다. 성공 시 JWT 토큰이 쿠키에 저장됩니다.")
+    @Operation(summary = "관리자 로그인", description = "소속 기관, 관리자 ID/PW로 로그인합니다. 성공 시 JWT 토큰이 쿠키에 저장됩니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "로그인 성공"),
+            @ApiResponse(responseCode = "400", description = "소속 기관 불일치"),
             @ApiResponse(responseCode = "401", description = "인증 실패 (ID 없음 또는 비밀번호 불일치)"),
             @ApiResponse(responseCode = "403", description = "비활성화된 계정"),
             @ApiResponse(responseCode = "423", description = "계정 잠김 (로그인 실패 5회 초과)")

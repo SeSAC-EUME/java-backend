@@ -7,4 +7,8 @@ import java.util.Optional;
 
 public interface EumeAdminRepository extends JpaRepository<EumeAdmin, Long> {
     Optional<EumeAdmin> findByAdminLoginId(String adminLoginId);
+
+    boolean existsByAdminLoginId(String adminLoginId);
+
+    boolean existsByAdminEmail(String adminEmail);
 }
