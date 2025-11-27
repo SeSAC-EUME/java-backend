@@ -48,6 +48,35 @@ public class SecurityConfiguration {
 
     @Bean
     @Order(2)
+    public SecurityFilterChain adminApiFilterChain(HttpSecurity http) throws Exception {
+        http
+            .securityMatcher("/api/admin/**")
+            .csrf(AbstractHttpConfigurer::disable)
+            .formLogin(AbstractHttpConfigurer::disable)
+            .authorizeHttpRequests(auth -> {
+                // 인증 불필요 (로그인 화면에서 호출)
+                auth.requestMatchers(HttpMethod.GET, "/api/admin/orgs").permitAll();
+                auth.requestMatchers(HttpMethod.POST, "/api/admin/register").permitAll();
+                auth.requestMatchers(HttpMethod.POST, "/api/admin/login").permitAll();
+
+                // 인증 필요
+                auth.requestMatchers("/api/admin/**").authenticated();
+            })
+            .sessionManagement(session ->
+                session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+            )
+            .exceptionHandling(exceptionHandling ->
+                exceptionHandling.authenticationEntryPoint(jwtAuthenticationEntryPoint)
+            )
+            .addFilterBefore(corsFilter(), SecurityContextHolderFilter.class)
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(exceptionHandlerFilter, CorsFilter.class);
+
+        return http.build();
+    }
+
+    @Bean
+    @Order(3)
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
             .securityMatcher("/**")
@@ -61,10 +90,22 @@ public class SecurityConfiguration {
                     auth.requestMatchers(HttpMethod.GET, "/oauth2/authorization/**").permitAll();
                     auth.requestMatchers(HttpMethod.GET, "/login/oauth2/code/**").permitAll();
 
-                    // EumeUser API 허용
+                    // EumeUser API
                     auth.requestMatchers(HttpMethod.POST, "/api/users/logout").authenticated();
                     auth.requestMatchers(HttpMethod.GET, "/api/users/me").authenticated();
                     auth.requestMatchers(HttpMethod.PUT, "/api/users/me").authenticated();
+
+                    // EumeChat API (AI 채팅)
+                    auth.requestMatchers(HttpMethod.GET, "/api/eume-chats/me").authenticated();
+                    auth.requestMatchers(HttpMethod.POST, "/api/eume-chats").authenticated();
+                    auth.requestMatchers(HttpMethod.GET, "/api/eume-chats/*/contents").authenticated();
+                    auth.requestMatchers(HttpMethod.POST, "/api/eume-chats/*/contents").authenticated();
+
+                    // UserChat API (사용자 간 채팅)
+                    auth.requestMatchers(HttpMethod.GET, "/api/user-chats").authenticated();
+                    auth.requestMatchers(HttpMethod.POST, "/api/user-chats").authenticated();
+                    auth.requestMatchers(HttpMethod.GET, "/api/user-chats/*/contents").authenticated();
+                    auth.requestMatchers(HttpMethod.POST, "/api/user-chats/*/contents").authenticated();
 
                     // Swagger UI 경로 허용 (기본 생성 문서)
                     auth.requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**", "/favicon.ico").permitAll();

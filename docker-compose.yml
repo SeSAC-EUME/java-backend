@@ -41,6 +41,8 @@ services:
       OAUTH2_REDIRECT_URI: ${OAUTH2_REDIRECT_URI}
       # JWT
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      # n8n Webhook
+      N8N_EUME_CHAT_WEBHOOK_URL: ${N8N_EUME_CHAT_WEBHOOK_URL}
 
     restart: unless-stopped
     networks:
