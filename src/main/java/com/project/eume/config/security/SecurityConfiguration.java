@@ -94,6 +94,8 @@ public class SecurityConfiguration {
                     auth.requestMatchers(HttpMethod.POST, "/api/users/logout").authenticated();
                     auth.requestMatchers(HttpMethod.GET, "/api/users/me").authenticated();
                     auth.requestMatchers(HttpMethod.PUT, "/api/users/me").authenticated();
+                    auth.requestMatchers(HttpMethod.POST, "/api/users/me/deactivate").authenticated();
+                    auth.requestMatchers(HttpMethod.POST, "/api/users/me/withdraw").authenticated();
 
                     // EumeChat API (AI 채팅)
                     auth.requestMatchers(HttpMethod.GET, "/api/eume-chats/me").authenticated();

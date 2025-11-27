@@ -56,6 +56,8 @@ dependencies {
 	implementation 'com.drewnoakes:metadata-extractor:2.19.0'
 	// WebP ImageIO support for reading and writing WebP images
 	implementation 'org.sejda.imageio:webp-imageio:0.1.6'
+	// Apache POI for Excel file generation
+	implementation 'org.apache.poi:poi-ooxml:5.2.5'
 }
 
 tasks.named('test') {

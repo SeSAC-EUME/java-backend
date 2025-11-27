@@ -7,7 +7,8 @@ public enum UserStatus {
      * <ul>
      *     <li> ACTIVE : 활성화</li>
      *     <li> DEACTIVATED : 비활성화</li>
+     *     <li> WITHDRAWN : 탈퇴</li>
      * </ul>
      */
-    ACTIVE, DEACTIVATED
+    ACTIVE, DEACTIVATED, WITHDRAWN
 }

@@ -11,7 +11,10 @@ public enum AdminErrorCode implements ErrorCode {
     INVALID_SIGUNGU(HttpStatus.BAD_REQUEST, "AD_0006", "소속 기관이 일치하지 않습니다"),
     SIGUNGU_NOT_FOUND(HttpStatus.NOT_FOUND, "AD_0007", "존재하지 않는 기관입니다"),
     DUPLICATE_LOGIN_ID(HttpStatus.CONFLICT, "AD_0008", "이미 사용 중인 로그인 ID입니다"),
-    DUPLICATE_EMAIL(HttpStatus.CONFLICT, "AD_0009", "이미 사용 중인 이메일입니다");
+    DUPLICATE_EMAIL(HttpStatus.CONFLICT, "AD_0009", "이미 사용 중인 이메일입니다"),
+    INVALID_STATUS(HttpStatus.BAD_REQUEST, "AD_0010", "잘못된 상태 값입니다"),
+    EXPORT_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "AD_0011", "파일 내보내기에 실패했습니다"),
+    INVALID_DATE_RANGE(HttpStatus.BAD_REQUEST, "AD_0012", "잘못된 날짜 범위입니다");
 
     private final HttpStatus httpStatus;
     private final String errorCode;

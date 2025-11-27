@@ -5,7 +5,9 @@ import com.project.eume.domain.dto.request.AdminLoginRequest;
 import com.project.eume.domain.dto.request.AdminRegisterRequest;
 import com.project.eume.domain.dto.response.AdminLoginResponse;
 import com.project.eume.domain.dto.response.AdminRegisterResponse;
+import com.project.eume.domain.dto.response.AdminUserStatusUpdateResponse;
 import com.project.eume.domain.entity.EumeAdmin;
+import com.project.eume.domain.entity.EumeUser;
 import com.project.eume.domain.entity.Sigungu;
 import com.project.eume.domain.enums.JwtRule;
 import com.project.eume.domain.enums.JwtType;
@@ -114,6 +116,30 @@ public class AdminService {
         // 쿠키 삭제
         deleteCookie(response, JwtRule.ACCESS_PREFIX.getValue());
         deleteCookie(response, JwtRule.REFRESH_PREFIX.getValue());
+    }
+
+
+    /**
+     * 이용자 상태 변경 (관리자 전용)
+     *
+     * @param userId    대상 사용자 ID
+     * @param newStatus 변경할 상태 (ACTIVE/DEACTIVATED)
+     * @return 변경 결과
+     */
+    @Transactional
+    public AdminUserStatusUpdateResponse updateUserStatus(Long userId, String newStatus) {
+        EumeUser user = adminSearchService.findUserById(userId);
+        String previousStatus = user.getUserStatus();
+
+        if ("ACTIVE".equals(newStatus)) {
+            user.activate();
+        } else if ("DEACTIVATED".equals(newStatus)) {
+            user.deactivate();
+        } else {
+            throw new AdminException(AdminErrorCode.INVALID_STATUS);
+        }
+
+        return AdminUserStatusUpdateResponse.of(userId, previousStatus, newStatus);
     }
 
     private void addTokenCookie(HttpServletResponse response, String name, String value, int maxAge) {

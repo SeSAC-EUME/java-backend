@@ -49,6 +49,49 @@ public class EumeUserService {
         return updatedUser;
     }
 
+
+    /**
+     * 사용자 계정 비활성화
+     *
+     * @param email    사용자 이메일
+     * @param response HTTP 응답 (쿠키 삭제용)
+     * @return 비활성화된 사용자
+     */
+    @Transactional
+    public EumeUser deactivateUser(String email, HttpServletResponse response) {
+        EumeUser user = userSearchService.findByEmail(email);
+        user.deactivate();
+
+        // JWT 쿠키 삭제 (로그아웃 처리)
+        removeCookie(response, JwtRule.ACCESS_PREFIX.getValue());
+        removeCookie(response, JwtRule.REFRESH_PREFIX.getValue());
+        removeCookie(response, "JSESSIONID");
+
+        log.info("User account deactivated: email={}", email);
+        return user;
+    }
+
+    /**
+     * 사용자 계정 탈퇴
+     *
+     * @param email    사용자 이메일
+     * @param response HTTP 응답 (쿠키 삭제용)
+     * @return 탈퇴 처리된 사용자
+     */
+    @Transactional
+    public EumeUser withdrawUser(String email, HttpServletResponse response) {
+        EumeUser user = userSearchService.findByEmail(email);
+        user.withdraw();
+
+        // JWT 쿠키 삭제 (로그아웃 처리)
+        removeCookie(response, JwtRule.ACCESS_PREFIX.getValue());
+        removeCookie(response, JwtRule.REFRESH_PREFIX.getValue());
+        removeCookie(response, "JSESSIONID");
+
+        log.info("User account withdrawn: email={}", email);
+        return user;
+    }
+
     private void removeCookie(HttpServletResponse response, String name) {
         Cookie cookie = new Cookie(name, "");
         cookie.setHttpOnly(true);

@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -55,5 +56,21 @@ public class AdminSearchService {
         }
 
         return userEmotionRepository.findByEumeUserIdOrderByAnalysisDateDesc(userId, pageable);
+    }
+
+
+    /**
+     * 전체 사용자 조회 (Excel 내보내기용, 페이지네이션 없음)
+     *
+     * @param status  상태 필터 (nullable)
+     * @param keyword 검색어 (nullable)
+     * @return 사용자 목록
+     */
+    public List<EumeUser> findAllUsers(String status, String keyword) {
+        // 기본 조회 (필터링은 추후 QueryDSL 등으로 확장 가능)
+        if (status != null && !status.isEmpty()) {
+            return eumeUserRepository.findByUserStatus(status);
+        }
+        return eumeUserRepository.findAll();
     }
 }
