@@ -41,4 +41,14 @@ public class EumeChatList {
     @UpdateTimestamp
     @Column(nullable = false)
     private LocalDateTime updatedAt;
+
+    /**
+     * 새로운 EumeChatList 생성을 위한 정적 팩토리 메서드
+     */
+    public static EumeChatList ofNewChatList(EumeUser eumeUser) {
+        return EumeChatList.builder()
+                .eumeUser(eumeUser)
+                .chatStatus(ChatStatus.ACTIVE)
+                .build();
+    }
 }
