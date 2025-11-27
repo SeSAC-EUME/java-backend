@@ -39,4 +39,21 @@ public class UserChatContent {
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    /**
+     * 새로운 메시지 생성을 위한 정적 팩토리 메서드
+     */
+    public static UserChatContent ofNewMessage(
+            UserChatList chatList,
+            EumeUser sender,
+            String messageType,
+            String messageContent
+    ) {
+        return UserChatContent.builder()
+                .userChatList(chatList)
+                .eumeUser(sender)
+                .messageType(messageType)
+                .messageContent(messageContent)
+                .build();
+    }
 }
