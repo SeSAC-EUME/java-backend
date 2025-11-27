@@ -1,5 +1,6 @@
 package com.project.eume.domain.entity;
 
+import com.project.eume.domain.enums.ChatStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -31,7 +32,7 @@ public class EumeChatList {
      * DEACTIVATED : 비활성화
      */
     @Column(nullable = false)
-    private String chatStatus;
+    private ChatStatus chatStatus;
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
