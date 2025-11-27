@@ -32,7 +32,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/user-chats")
-@Tag(name = "UserChat", description = "사용자 간 채팅 관련 API")
+@Tag(name = "UserChat", description = "AI 다중 채팅 관련 API")
 public class UserChatController {
 
     private final EumeUserSearchService eumeUserSearchService;
@@ -58,7 +58,7 @@ public class UserChatController {
     }
 
     @PostMapping
-    @Operation(summary = "채팅방 생성", description = "새로운 사용자 간 채팅방을 생성합니다.")
+    @Operation(summary = "채팅방 생성", description = "AI와의 새로운 다중 채팅방을 생성합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "채팅방 생성 성공"),
             @ApiResponse(responseCode = "400", description = "잘못된 요청 (제목 없음 또는 100자 초과)"),

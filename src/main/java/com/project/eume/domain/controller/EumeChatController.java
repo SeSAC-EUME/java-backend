@@ -32,7 +32,7 @@ import java.util.Optional;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/eume/chat")
+@RequestMapping("/api/eume-chats")
 @Tag(name = "EumeChat", description = "Eume AI 채팅 관련 API")
 public class EumeChatController {
 

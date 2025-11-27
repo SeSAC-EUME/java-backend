@@ -103,7 +103,7 @@ public class SecurityConfiguration {
                     auth.requestMatchers(HttpMethod.GET, "/api/eume-chats/*/contents").authenticated();
                     auth.requestMatchers(HttpMethod.POST, "/api/eume-chats/*/contents").authenticated();
 
-                    // UserChat API (사용자 간 채팅)
+                    // UserChat API (AI 다중 채팅)
                     auth.requestMatchers(HttpMethod.GET, "/api/user-chats").authenticated();
                     auth.requestMatchers(HttpMethod.POST, "/api/user-chats").authenticated();
                     auth.requestMatchers(HttpMethod.GET, "/api/user-chats/*/contents").authenticated();
