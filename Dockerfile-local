@@ -1,0 +1,21 @@
+FROM eclipse-temurin:17-jre
+
+# 인자 설정 - JAR_File
+ARG JAR_FILE=build/libs/*.jar
+
+# jar 파일 복제
+COPY ${JAR_FILE} app.jar
+
+# 인자 설정 부분과 jar 파일 복제 부분 합쳐서 진행해도 무방
+#COPY build/libs/*.jar app.jar
+
+EXPOSE 8080
+
+# 실행 명령어
+ENTRYPOINT ["java", "-jar", "-Dspring.profiles.active=local", "app.jar"]
+
+# docker image build 명령어 (이미지 빌드, latest 태그 추가)
+# docker build -f Dockerfile-local -t leehh0221/eume-backend:latest .
+
+# docker image push 명령어 (도커 허브에 이미지 업로드)
+# docker push leehh0221/eume-backend:latest

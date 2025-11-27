@@ -38,3 +38,12 @@ out/
 
 ### Claude AI ###
 .claude
+
+src/main/resources/application-local.yaml
+
+### Environment ###
+.env
+.env.*
+
+### DB ###
+postgres_data
