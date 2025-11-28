@@ -35,8 +35,7 @@ public class AdminService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
-    private static final int ACCESS_TOKEN_MAX_AGE = 60 * 60; // 1시간
-    private static final int REFRESH_TOKEN_MAX_AGE = 60 * 60 * 24 * 30; // 30일
+    private static final int ACCESS_TOKEN_MAX_AGE = 60 * 60 * 24; // 24시간
 
     @Transactional
     public AdminLoginResponse login(AdminLoginRequest request, HttpServletResponse response) {
@@ -69,11 +68,9 @@ public class AdminService {
 
         // 7. JWT 토큰 생성 및 쿠키 설정
         String code = UUID.randomUUID().toString();
-        String accessToken = jwtUtil.generateJwt(admin.getAdminEmail(), code, JwtType.ACCESS_TOKEN);
-        String refreshToken = jwtUtil.generateJwt(admin.getAdminEmail(), code, JwtType.REFRESH_TOKEN);
+        String accessToken = jwtUtil.generateJwt(admin.getAdminLoginId(), code, JwtType.ACCESS_TOKEN);
 
-        addTokenCookie(response, JwtRule.ACCESS_PREFIX.getValue(), accessToken, ACCESS_TOKEN_MAX_AGE);
-        addTokenCookie(response, JwtRule.REFRESH_PREFIX.getValue(), refreshToken, REFRESH_TOKEN_MAX_AGE);
+        addTokenCookie(response, JwtRule.ADMIN_ACCESS_PREFIX.getValue(), accessToken, ACCESS_TOKEN_MAX_AGE);
 
         return AdminLoginResponse.from(admin);
     }
@@ -114,8 +111,7 @@ public class AdminService {
 
     public void logout(HttpServletResponse response) {
         // 쿠키 삭제
-        deleteCookie(response, JwtRule.ACCESS_PREFIX.getValue());
-        deleteCookie(response, JwtRule.REFRESH_PREFIX.getValue());
+        deleteCookie(response, JwtRule.ADMIN_ACCESS_PREFIX.getValue());
     }
 
 

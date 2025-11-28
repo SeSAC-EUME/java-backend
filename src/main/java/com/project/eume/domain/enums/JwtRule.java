@@ -9,7 +9,8 @@ public enum JwtRule {
     JWT_ISSUE_HEADER("Set-Cookie"),
     JWT_RESOLVE_HEADER("Cookie"),
     REFRESH_PREFIX("eume_refresh_token"), // TODO 1: Refresh Token 추가 예정
-    ACCESS_PREFIX("eume_access_token");
+    ACCESS_PREFIX("eume_access_token"),
+    ADMIN_ACCESS_PREFIX("eume_admin_access_token");
 
     private final String value;
 

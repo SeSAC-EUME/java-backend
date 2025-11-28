@@ -1,5 +1,6 @@
 package com.project.eume.config.security;
 
+import com.project.eume.config.security.jwt.AdminJwtAuthenticationFilter;
 import com.project.eume.config.security.jwt.JwtAuthenticationFilter;
 import com.project.eume.config.security.oauth2.CustomOAuth2UserService;
 import com.project.eume.config.security.oauth2.handler.OAuth2FailureHandler;
@@ -9,7 +10,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -32,6 +32,7 @@ public class SecurityConfiguration {
     private final OAuth2FailureHandler oAuth2FailureHandler;
     private final CustomOAuth2UserService customOAuth2UserService;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final AdminJwtAuthenticationFilter adminJwtAuthenticationFilter;
     private final ExceptionHandlerFilter exceptionHandlerFilter;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
 
@@ -69,7 +70,7 @@ public class SecurityConfiguration {
                 exceptionHandling.authenticationEntryPoint(jwtAuthenticationEntryPoint)
             )
             .addFilterBefore(corsFilter(), SecurityContextHolderFilter.class)
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(adminJwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(exceptionHandlerFilter, CorsFilter.class);
 
         return http.build();

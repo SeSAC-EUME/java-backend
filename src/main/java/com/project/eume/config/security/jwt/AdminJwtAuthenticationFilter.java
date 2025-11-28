@@ -1,9 +1,9 @@
 package com.project.eume.config.security.jwt;
 
-import com.project.eume.config.security.UserDetailsServiceImpl;
+import com.project.eume.config.security.AdminDetailsServiceImpl;
 import com.project.eume.domain.enums.JwtRule;
-import com.project.eume.exceptions.errorcode.EumeUserErrorCode;
-import com.project.eume.exceptions.exception.EumeUserException;
+import com.project.eume.exceptions.errorcode.AdminErrorCode;
+import com.project.eume.exceptions.exception.AdminException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -24,9 +24,9 @@ import static java.util.Objects.isNull;
 
 @Component
 @RequiredArgsConstructor
-public class JwtAuthenticationFilter extends OncePerRequestFilter {
+public class AdminJwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
-    private final UserDetailsServiceImpl userDetailsService;
+    private final AdminDetailsServiceImpl adminDetailsService;
 
     @Override
     protected void doFilterInternal(
@@ -59,7 +59,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             return null;
         }
         return Arrays.stream(request.getCookies())
-            .filter(cookie -> JwtRule.ACCESS_PREFIX.getValue().equals(cookie.getName()))
+            .filter(cookie -> JwtRule.ADMIN_ACCESS_PREFIX.getValue().equals(cookie.getName()))
             .findFirst()
             .map(Cookie::getValue)
             .orElse(null);
@@ -72,11 +72,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
      */
     private void setAuthenticationToContext(String accessToken) {
         String username = jwtUtil.extractUsername(accessToken);
-        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        UserDetails userDetails = adminDetailsService.loadUserByUsername(username);
 
         // 계정 상태 검증
         if (!userDetails.isEnabled()) {
-            throw new EumeUserException(EumeUserErrorCode.DEACTIVATED_USER);
+            throw new AdminException(AdminErrorCode.ADMIN_NOT_FOUND);
         }
 
         Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
