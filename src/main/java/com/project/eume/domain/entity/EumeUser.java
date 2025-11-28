@@ -4,6 +4,8 @@ import com.project.eume.domain.dto.request.EumeUserUpdateRequest;
 import com.project.eume.domain.enums.BackgroundTheme;
 import com.project.eume.domain.enums.LoginPlatform;
 import com.project.eume.domain.enums.UserStatus;
+import com.project.eume.exceptions.errorcode.EumeUserErrorCode;
+import com.project.eume.exceptions.exception.EumeUserException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -119,5 +121,44 @@ public class EumeUser {
         if (!isNull(request.gender())) this.gender = request.gender();
         if (!isNull(request.phone())) this.phone = request.phone();
         if (!isNull(request.backgroundTheme())) this.backgroundTheme = request.backgroundTheme();
+    }
+
+
+    /**
+     * 계정 비활성화
+     */
+    public void deactivate() {
+        if (UserStatus.DEACTIVATED.name().equals(this.userStatus)) {
+            throw new EumeUserException(EumeUserErrorCode.ALREADY_DEACTIVATED);
+        }
+        this.userStatus = UserStatus.DEACTIVATED.name();
+    }
+
+    /**
+     * 계정 활성화 (Admin 전용)
+     */
+    public void activate() {
+        this.userStatus = UserStatus.ACTIVE.name();
+    }
+
+    /**
+     * 계정 탈퇴 처리
+     */
+    public void withdraw() {
+        this.userStatus = UserStatus.WITHDRAWN.name();
+    }
+
+    /**
+     * 비활성화 여부 확인
+     */
+    public boolean isDeactivated() {
+        return UserStatus.DEACTIVATED.name().equals(this.userStatus);
+    }
+
+    /**
+     * 탈퇴 여부 확인
+     */
+    public boolean isWithdrawn() {
+        return UserStatus.WITHDRAWN.name().equals(this.userStatus);
     }
 }

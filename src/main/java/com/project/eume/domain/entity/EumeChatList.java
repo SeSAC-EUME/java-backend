@@ -1,5 +1,6 @@
 package com.project.eume.domain.entity;
 
+import com.project.eume.domain.enums.ChatStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -31,7 +32,7 @@ public class EumeChatList {
      * DEACTIVATED : 비활성화
      */
     @Column(nullable = false)
-    private String chatStatus;
+    private ChatStatus chatStatus;
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
@@ -40,4 +41,14 @@ public class EumeChatList {
     @UpdateTimestamp
     @Column(nullable = false)
     private LocalDateTime updatedAt;
+
+    /**
+     * 새로운 EumeChatList 생성을 위한 정적 팩토리 메서드
+     */
+    public static EumeChatList ofNewChatList(EumeUser eumeUser) {
+        return EumeChatList.builder()
+                .eumeUser(eumeUser)
+                .chatStatus(ChatStatus.ACTIVE)
+                .build();
+    }
 }

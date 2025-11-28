@@ -6,3 +6,9 @@ logging:
   level:
     org.hibernate.SQL: debug
     org.hibernate.type.descriptor.sql.BasicBinder: trace
+
+# n8n 웹훅 설정
+n8n:
+  webhook:
+    eume-chat:
+      url: ${N8N_EUME_CHAT_WEBHOOK_URL:}

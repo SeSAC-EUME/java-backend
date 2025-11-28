@@ -1,5 +1,6 @@
 package com.project.eume.config.security.jwt;
 
+import com.project.eume.config.security.UserDetailsServiceImpl;
 import com.project.eume.domain.enums.JwtRule;
 import com.project.eume.exceptions.errorcode.EumeUserErrorCode;
 import com.project.eume.exceptions.exception.EumeUserException;
@@ -13,7 +14,6 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -26,7 +26,7 @@ import static java.util.Objects.isNull;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
-    private final UserDetailsService userDetailsService;
+    private final UserDetailsServiceImpl userDetailsService;
 
     @Override
     protected void doFilterInternal(

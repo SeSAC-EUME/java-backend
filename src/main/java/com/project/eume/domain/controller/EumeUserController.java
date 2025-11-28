@@ -4,6 +4,8 @@ import com.project.eume.domain.dto.request.EumeUserUpdateRequest;
 import com.project.eume.domain.dto.response.EumeUserLogoutResponse;
 import com.project.eume.domain.dto.response.EumeUserProfileResponse;
 import com.project.eume.domain.dto.response.EumeUserUpdateResponse;
+import com.project.eume.domain.dto.response.UserDeactivateResponse;
+import com.project.eume.domain.dto.response.UserWithdrawResponse;
 import com.project.eume.domain.entity.EumeUser;
 import com.project.eume.domain.service.EumeUserSearchService;
 import com.project.eume.domain.service.EumeUserService;
@@ -78,5 +80,37 @@ public class EumeUserController {
         EumeUser updatedUser = eumeUserService.updateUser(email, request);
         EumeUserUpdateResponse response = EumeUserUpdateResponse.from(updatedUser);
         return ResponseEntity.ok(response);
+    }
+
+
+    @PostMapping("/me/deactivate")
+    @Operation(summary = "계정 비활성화", description = "로그인한 사용자의 계정을 비활성화합니다. 비활성화된 계정은 로그인할 수 없습니다.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "비활성화 성공"),
+        @ApiResponse(responseCode = "401", description = "인증 실패 (JWT 토큰 없음 또는 유효하지 않음)"),
+        @ApiResponse(responseCode = "409", description = "이미 비활성화된 계정")
+    })
+    public ResponseEntity<UserDeactivateResponse> deactivateAccount(
+        @AuthenticationPrincipal UserDetails userDetails,
+        HttpServletResponse httpResponse
+    ) {
+        String email = userDetails.getUsername();
+        EumeUser user = eumeUserService.deactivateUser(email, httpResponse);
+        return ResponseEntity.ok(UserDeactivateResponse.from(user));
+    }
+
+    @PostMapping("/me/withdraw")
+    @Operation(summary = "계정 탈퇴", description = "로그인한 사용자의 계정을 탈퇴 처리합니다. 탈퇴 후에는 동일 계정으로 재가입이 불가능합니다.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "탈퇴 성공"),
+        @ApiResponse(responseCode = "401", description = "인증 실패 (JWT 토큰 없음 또는 유효하지 않음)")
+    })
+    public ResponseEntity<UserWithdrawResponse> withdrawAccount(
+        @AuthenticationPrincipal UserDetails userDetails,
+        HttpServletResponse httpResponse
+    ) {
+        String email = userDetails.getUsername();
+        eumeUserService.withdrawUser(email, httpResponse);
+        return ResponseEntity.ok(UserWithdrawResponse.success());
     }
 }

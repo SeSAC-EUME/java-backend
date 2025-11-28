@@ -39,4 +39,28 @@ public class EumeChatContent {
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    /**
+     * 사용자 메시지 생성을 위한 정적 팩토리 메서드
+     */
+    public static EumeChatContent ofUserMessage(EumeChatList chatList, EumeUser user, String content) {
+        return EumeChatContent.builder()
+                .eumeChatList(chatList)
+                .eumeUser(user)
+                .messageType("USER")
+                .messageContent(content)
+                .build();
+    }
+
+    /**
+     * AI(Eume) 메시지 생성을 위한 정적 팩토리 메서드
+     */
+    public static EumeChatContent ofEumeMessage(EumeChatList chatList, EumeUser user, String content) {
+        return EumeChatContent.builder()
+                .eumeChatList(chatList)
+                .eumeUser(user)
+                .messageType("EUME")
+                .messageContent(content)
+                .build();
+    }
 }
