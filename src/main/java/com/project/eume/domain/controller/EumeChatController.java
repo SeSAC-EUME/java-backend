@@ -26,6 +26,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 import java.util.Optional;
 
@@ -109,14 +110,13 @@ public class EumeChatController {
             @ApiResponse(responseCode = "404", description = "채팅방을 찾을 수 없음"),
             @ApiResponse(responseCode = "500", description = "AI 응답 생성 실패")
     })
-    public ResponseEntity<EumeChatContentCreateResponse> sendMessage(
+    public Mono<ResponseEntity<EumeChatContentCreateResponse>> sendMessage(
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long chatListId,
             @Valid @RequestBody EumeChatContentCreateRequest request
     ) {
         String email = userDetails.getUsername();
-        EumeChatContentCreateResponse response = eumeChatService
-                .sendMessage(email, chatListId, request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return eumeChatService.sendMessage(email, chatListId, request)
+                .map(response -> ResponseEntity.status(HttpStatus.CREATED).body(response));
     }
 }
