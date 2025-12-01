@@ -1,6 +1,7 @@
 package com.project.eume.domain.controller;
 
 import com.project.eume.domain.dto.request.UserChatContentCreateRequest;
+import com.project.eume.domain.dto.response.UserChatContentCreateResponse;
 import com.project.eume.domain.dto.response.UserChatContentListResponse;
 import com.project.eume.domain.dto.response.UserChatListCreateResponse;
 import com.project.eume.domain.dto.response.UserChatListListResponse;
@@ -102,7 +103,7 @@ public class UserChatController {
             @ApiResponse(responseCode = "404", description = "채팅방을 찾을 수 없음"),
             @ApiResponse(responseCode = "500", description = "AI 응답 생성 실패")
     })
-    public Mono<ResponseEntity<String>> sendMessage(
+    public Mono<ResponseEntity<UserChatContentCreateResponse>> sendMessage(
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long chatListId,
             @Valid @RequestBody UserChatContentCreateRequest request

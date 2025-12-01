@@ -2,24 +2,27 @@ package com.project.eume.domain.dto.response;
 
 import com.project.eume.domain.entity.UserChatContent;
 
-import java.time.LocalDateTime;
-
 public record UserChatContentCreateResponse(
-        Long id,
-        Long senderId,
-        String senderName,
-        String messageType,
-        String messageContent,
-        LocalDateTime createdAt
+        UserChatContentResponse userMessage,
+        UserChatContentResponse eumeMessage
 ) {
-    public static UserChatContentCreateResponse from(UserChatContent content) {
+    public static UserChatContentCreateResponse from(
+            UserChatContent userContent,
+            UserChatContent eumeContent
+    ) {
         return new UserChatContentCreateResponse(
-                content.getId(),
-                content.getEumeUser().getId(),
-                content.getEumeUser().getUserName(),
-                content.getMessageType(),
-                content.getMessageContent(),
-                content.getCreatedAt()
+                UserChatContentResponse.from(userContent),
+                UserChatContentResponse.from(eumeContent)
+        );
+    }
+
+    /**
+     * n8n에서 메시지 저장을 담당하는 경우, 응답 문자열만으로 생성
+     */
+    public static UserChatContentCreateResponse fromAiResponse(String userMessage, String eumeResponse) {
+        return new UserChatContentCreateResponse(
+                new UserChatContentResponse(null, null, null, "USER", userMessage, null),
+                new UserChatContentResponse(null, null, null, "EUME", eumeResponse, null)
         );
     }
 }

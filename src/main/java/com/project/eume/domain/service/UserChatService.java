@@ -1,6 +1,7 @@
 package com.project.eume.domain.service;
 
 import com.project.eume.domain.dto.request.UserChatContentCreateRequest;
+import com.project.eume.domain.dto.response.UserChatContentCreateResponse;
 import com.project.eume.domain.entity.UserChatContent;
 import com.project.eume.domain.entity.UserChatList;
 import com.project.eume.domain.entity.EumeUser;
@@ -37,7 +38,7 @@ public class UserChatService {
         return userChatSearchService.findContentsByChatListId(chatListId, page, size);
     }
 
-    public Mono<String> sendMessage(
+    public Mono<UserChatContentCreateResponse> sendMessage(
             String userEmail,
             Long chatListId,
             UserChatContentCreateRequest request
@@ -49,8 +50,11 @@ public class UserChatService {
         UserChatList chatList = userChatSearchService.findById(chatListId);
         validateChatRoomAccess(chatList, user);
 
+        String userMessage = request.messageContent();
+
         // 3. n8n 웹훅 호출하여 AI 응답 받기 (비동기)
-        return callN8nWebhook(chatList, user, request.messageContent());
+        return callN8nWebhook(chatList, user, userMessage)
+                .map(eumeResponse -> UserChatContentCreateResponse.fromAiResponse(userMessage, eumeResponse));
     }
 
     public void validateChatRoomAccess(UserChatList chatList, EumeUser user) {
