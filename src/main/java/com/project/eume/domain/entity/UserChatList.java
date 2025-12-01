@@ -46,10 +46,9 @@ public class UserChatList {
     /**
      * 새로운 채팅방 생성을 위한 정적 팩토리 메서드
      */
-    public static UserChatList ofNewChatRoom(EumeUser eumeUser, String roomTitle) {
+    public static UserChatList ofNewChatRoom(EumeUser eumeUser) {
         return UserChatList.builder()
                 .eumeUser(eumeUser)
-                .roomTitle(roomTitle)
                 .roomStatus("ACTIVE")
                 .build();
     }

@@ -1,8 +1,6 @@
 package com.project.eume.domain.controller;
 
 import com.project.eume.domain.dto.request.UserChatContentCreateRequest;
-import com.project.eume.domain.dto.request.UserChatListCreateRequest;
-import com.project.eume.domain.dto.response.UserChatContentCreateResponse;
 import com.project.eume.domain.dto.response.UserChatContentListResponse;
 import com.project.eume.domain.dto.response.UserChatListCreateResponse;
 import com.project.eume.domain.dto.response.UserChatListListResponse;
@@ -27,6 +25,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import reactor.core.publisher.Mono;
 
 @Slf4j
 @RestController
@@ -65,12 +64,11 @@ public class UserChatController {
             @ApiResponse(responseCode = "401", description = "인증 실패 (JWT 토큰 없음 또는 유효하지 않음)")
     })
     public ResponseEntity<UserChatListCreateResponse> createChatRoom(
-            @AuthenticationPrincipal UserDetails userDetails,
-            @Valid @RequestBody UserChatListCreateRequest request
+            @AuthenticationPrincipal UserDetails userDetails
     ) {
         String email = userDetails.getUsername();
         EumeUser user = eumeUserSearchService.findByEmail(email);
-        UserChatList chatRoom = userChatRegisterService.createChatRoom(user, request.roomTitle());
+        UserChatList chatRoom = userChatRegisterService.createChatRoom(user);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(UserChatListCreateResponse.from(chatRoom));
     }
@@ -95,21 +93,22 @@ public class UserChatController {
     }
 
     @PostMapping("/{chatListId}/contents")
-    @Operation(summary = "메시지 발송", description = "채팅방에 메시지를 발송합니다.")
+    @Operation(summary = "메시지 발송", description = "채팅방에 메시지를 발송하고 AI 응답을 받습니다.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "메시지 발송 성공"),
-            @ApiResponse(responseCode = "400", description = "잘못된 요청 (메시지 내용 또는 타입 없음)"),
+            @ApiResponse(responseCode = "201", description = "메시지 발송 및 AI 응답 성공"),
+            @ApiResponse(responseCode = "400", description = "잘못된 요청 (메시지 내용 없음)"),
             @ApiResponse(responseCode = "401", description = "인증 실패 (JWT 토큰 없음 또는 유효하지 않음)"),
             @ApiResponse(responseCode = "403", description = "접근 권한 없음"),
-            @ApiResponse(responseCode = "404", description = "채팅방을 찾을 수 없음")
+            @ApiResponse(responseCode = "404", description = "채팅방을 찾을 수 없음"),
+            @ApiResponse(responseCode = "500", description = "AI 응답 생성 실패")
     })
-    public ResponseEntity<UserChatContentCreateResponse> sendMessage(
+    public Mono<ResponseEntity<String>> sendMessage(
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable Long chatListId,
             @Valid @RequestBody UserChatContentCreateRequest request
     ) {
         String email = userDetails.getUsername();
-        UserChatContentCreateResponse response = userChatService.sendMessage(email, chatListId, request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return userChatService.sendMessage(email, chatListId, request)
+                .map(response -> ResponseEntity.status(HttpStatus.CREATED).body(response));
     }
 }

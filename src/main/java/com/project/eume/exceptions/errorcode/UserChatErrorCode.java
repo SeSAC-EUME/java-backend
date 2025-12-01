@@ -8,7 +8,8 @@ public enum UserChatErrorCode implements ErrorCode {
     FORBIDDEN_ACCESS(HttpStatus.FORBIDDEN, "UC_0003", "채팅방 접근 권한이 없습니다"),
     INVALID_PAGE_NUMBER(HttpStatus.BAD_REQUEST, "UC_0004", "페이지 번호는 0 이상이어야 합니다"),
     INVALID_PAGE_SIZE(HttpStatus.BAD_REQUEST, "UC_0005", "페이지 크기는 1 이상이어야 합니다"),
-    EMPTY_MESSAGE_CONTENT(HttpStatus.BAD_REQUEST, "UC_0006", "메시지 내용이 비어있습니다");
+    EMPTY_MESSAGE_CONTENT(HttpStatus.BAD_REQUEST, "UC_0006", "메시지 내용이 비어있습니다"),
+    N8N_WEBHOOK_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "UC_0007", "AI 서비스 호출에 실패했습니다");
 
     private final HttpStatus httpStatus;
     private final String errorCode;
