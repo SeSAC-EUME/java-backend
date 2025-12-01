@@ -27,7 +27,7 @@ public class UserChatService {
     private final EumeUserSearchService eumeUserSearchService;
     private final WebClient webClient;
 
-    @Value("${n8n.webhook.user-chat.url:}")
+    @Value("${n8n.webhook.user-chat.url}")
     private String n8nWebhookUrl;
 
     public Page<UserChatContent> getContents(String userEmail, Long chatListId, int page, int size) {

@@ -26,11 +26,42 @@ public class OAuth2FailureHandler extends SimpleUrlAuthenticationFailureHandler 
         HttpServletResponse response,
         AuthenticationException exception
     ) throws IOException {
+        // 콘솔에 직접 출력 (디버깅용)
+        System.out.println("\n========== OAuth2 Authentication Failure ==========");
+        System.out.println("Exception Type: " + exception.getClass().getName());
+        System.out.println("Exception Message: " + exception.getMessage());
+        System.out.println("Request URI: " + request.getRequestURI());
+        System.out.println("Request URL: " + request.getRequestURL());
+        System.out.println("Query String: " + request.getQueryString());
+        System.out.println("Remote Address: " + request.getRemoteAddr());
+
+        // OAuth2 관련 상세 정보
+        if (exception instanceof OAuth2AuthenticationException oauth2Exception) {
+            System.out.println("OAuth2 Error Code: " + oauth2Exception.getError().getErrorCode());
+            System.out.println("OAuth2 Error Description: " + oauth2Exception.getError().getDescription());
+            System.out.println("OAuth2 Error URI: " + oauth2Exception.getError().getUri());
+        }
+
+        // Cause 체인 출력
+        Throwable cause = exception.getCause();
+        int depth = 1;
+        while (cause != null) {
+            System.out.println("Cause [" + depth + "] Type: " + cause.getClass().getName());
+            System.out.println("Cause [" + depth + "] Message: " + cause.getMessage());
+            cause = cause.getCause();
+            depth++;
+        }
+
+        // 스택 트레이스 출력
+        System.out.println("Full Stack Trace:");
+        exception.printStackTrace(System.out);
+        System.out.println("====================================================\n");
+
         String errorCode = mapExceptionToErrorCode(exception);
         String redirectUrl = UriComponentsBuilder.fromUriString(REDIRECT_URL)
             .queryParam("error", errorCode)
             .build().toUriString();
-        log.error("OAUTH2_FAILURE_HANDLE", StructuredArguments.keyValue("exception", new WarnLogData("OAUTH2_FAILURE", "request oauth2 fail", exception)));
+        System.out.println("Redirecting to: " + redirectUrl + " with errorCode: " + errorCode);
         getRedirectStrategy().sendRedirect(request, response, redirectUrl);
     }
 

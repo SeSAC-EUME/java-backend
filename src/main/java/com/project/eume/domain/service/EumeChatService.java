@@ -27,7 +27,7 @@ public class EumeChatService {
     private final EumeUserSearchService eumeUserSearchService;
     private final WebClient webClient;
 
-    @Value("${n8n.webhook.eume-chat.url:}")
+    @Value("${n8n.webhook.eume-chat.url}")
     private String n8nWebhookUrl;
 
     @Transactional
