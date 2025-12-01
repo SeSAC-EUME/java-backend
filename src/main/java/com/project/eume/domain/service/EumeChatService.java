@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
 
 import java.util.Map;
 
@@ -26,11 +27,11 @@ public class EumeChatService {
     private final EumeUserSearchService eumeUserSearchService;
     private final WebClient webClient;
 
-    @Value("${n8n.webhook.eume-chat.url:}")
+    @Value("${n8n.webhook.eume-chat.url}")
     private String n8nWebhookUrl;
 
     @Transactional
-    public EumeChatContentCreateResponse sendMessage(
+    public Mono<EumeChatContentCreateResponse> sendMessage(
             String userEmail,
             Long chatListId,
             EumeChatContentCreateRequest request
@@ -42,20 +43,14 @@ public class EumeChatService {
         EumeChatList chatList = eumeChatSearchService.findById(chatListId);
         validateChatListOwnership(chatList, user);
 
-        // 3. 사용자 메시지 저장
-        EumeChatContent userContent = eumeChatRegisterService.saveUserMessage(
-                chatList, user, request.messageContent()
-        );
+        EumeChatContent userContent = EumeChatContent.ofUserMessage(chatList, user, request.messageContent());
 
-        // 4. n8n 웹훅 호출하여 AI 응답 받기
-        String eumeResponse = callN8nWebhook(request.messageContent());
-
-        // 5. AI 응답 저장
-        EumeChatContent eumeContent = eumeChatRegisterService.saveEumeMessage(
-                chatList, user, eumeResponse
-        );
-
-        return EumeChatContentCreateResponse.from(userContent, eumeContent);
+        // 3. n8n 웹훅 호출하여 AI 응답 받기 (비동기)
+        return callN8nWebhook(userContent)
+            .map(eumeResponse -> {
+                EumeChatContent eumeContent = EumeChatContent.ofUserMessage(chatList, user, eumeResponse);
+                return EumeChatContentCreateResponse.from(userContent, eumeContent);
+            });
     }
 
     public void validateChatListOwnership(EumeChatList chatList, EumeUser user) {
@@ -64,28 +59,30 @@ public class EumeChatService {
         }
     }
 
-    private String callN8nWebhook(String message) {
+    private Mono<String> callN8nWebhook(EumeChatContent eumeChatContent) {
         if (n8nWebhookUrl == null || n8nWebhookUrl.isBlank()) {
             log.warn("n8n webhook URL is not configured. Returning default response.");
-            return "안녕하세요! 이음이입니다. 현재 AI 서비스가 설정되지 않았습니다.";
+            return Mono.just("안녕하세요! 이음이입니다. 현재 AI 서비스가 설정되지 않았습니다.");
         }
 
-        try {
-            Map<String, String> response = webClient.post()
-                    .uri(n8nWebhookUrl)
-                    .bodyValue(Map.of("message", message))
-                    .retrieve()
-                    .bodyToMono(Map.class)
-                    .block();
-
-            if (response != null && response.containsKey("response")) {
-                return response.get("response").toString();
-            }
-
-            return "AI 응답을 처리할 수 없습니다.";
-        } catch (Exception e) {
-            log.error("n8n webhook call failed: {}", e.getMessage(), e);
-            throw new EumeChatException(EumeChatErrorCode.N8N_WEBHOOK_ERROR);
-        }
+        return webClient.post()
+                .uri(n8nWebhookUrl)
+                .bodyValue(Map.of(
+                        "message", eumeChatContent.getMessageContent(),
+                        "sessionId", eumeChatContent.getEumeChatList().getId().toString(),
+                        "userId", eumeChatContent.getEumeUser().getId().toString()
+                ))
+                .retrieve()
+                .bodyToMono(Map.class)
+                .map(response -> {
+                    if (response != null && response.containsKey("response")) {
+                        return response.get("response").toString();
+                    }
+                    return "AI 응답을 처리할 수 없습니다.";
+                })
+                .onErrorResume(e -> {
+                    log.error("n8n webhook call failed: {}", e.getMessage(), e);
+                    return Mono.error(new EumeChatException(EumeChatErrorCode.N8N_WEBHOOK_ERROR));
+                });
     }
 }

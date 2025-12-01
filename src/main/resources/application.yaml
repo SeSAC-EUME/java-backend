@@ -11,4 +11,6 @@ logging:
 n8n:
   webhook:
     eume-chat:
-      url: ${N8N_EUME_CHAT_WEBHOOK_URL:}
+      url: ${N8N_EUME_CHAT_WEBHOOK_URL}
+    user-chat:
+      url: ${N8N_USER_CHAT_WEBHOOK_URL}

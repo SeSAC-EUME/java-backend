@@ -17,8 +17,8 @@ public class UserChatRegisterService {
     private final UserChatContentRepository userChatContentRepository;
 
     @Transactional
-    public UserChatList createChatRoom(EumeUser eumeUser, String roomTitle) {
-        UserChatList chatRoom = UserChatList.ofNewChatRoom(eumeUser, roomTitle);
+    public UserChatList createChatRoom(EumeUser eumeUser) {
+        UserChatList chatRoom = UserChatList.ofNewChatRoom(eumeUser);
         return userChatListRepository.save(chatRoom);
     }
 

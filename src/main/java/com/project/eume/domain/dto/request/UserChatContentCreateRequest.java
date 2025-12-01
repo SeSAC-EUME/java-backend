@@ -4,9 +4,6 @@ import jakarta.validation.constraints.NotBlank;
 
 public record UserChatContentCreateRequest(
         @NotBlank(message = "메시지 내용은 필수입니다")
-        String messageContent,
-
-        @NotBlank(message = "메시지 타입은 필수입니다")
-        String messageType
+        String messageContent
 ) {
 }
