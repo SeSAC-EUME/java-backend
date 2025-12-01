@@ -48,7 +48,7 @@ public class EumeChatService {
         );
 
         // 4. n8n 웹훅 호출하여 AI 응답 받기
-        String eumeResponse = callN8nWebhook(request.messageContent());
+        String eumeResponse = callN8nWebhook(userContent);
 
         // 5. AI 응답 저장
         EumeChatContent eumeContent = eumeChatRegisterService.saveEumeMessage(
@@ -64,16 +64,20 @@ public class EumeChatService {
         }
     }
 
-    private String callN8nWebhook(String message) {
+    private String callN8nWebhook(EumeChatContent eumeChatContent) {
         if (n8nWebhookUrl == null || n8nWebhookUrl.isBlank()) {
             log.warn("n8n webhook URL is not configured. Returning default response.");
             return "안녕하세요! 이음이입니다. 현재 AI 서비스가 설정되지 않았습니다.";
         }
 
         try {
-            Map<String, String> response = webClient.post()
+            Map response = webClient.post()
                     .uri(n8nWebhookUrl)
-                    .bodyValue(Map.of("message", message))
+                    .bodyValue(Map.of(
+                        "message", eumeChatContent.getMessageContent(),
+                        "sessionId", eumeChatContent.getEumeChatList().getId().toString(),
+                        "userId", eumeChatContent.getEumeUser().getId().toString()
+                        ))
                     .retrieve()
                     .bodyToMono(Map.class)
                     .block();
