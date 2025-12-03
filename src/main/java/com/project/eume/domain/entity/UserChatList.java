@@ -52,4 +52,13 @@ public class UserChatList {
                 .roomStatus("ACTIVE")
                 .build();
     }
+
+    /**
+     * 채팅 방의 title을 설정하는 메서드
+     *
+     * @param roomTitle
+     */
+    public void setRoomTitle(String roomTitle) {
+        this.roomTitle = roomTitle;
+    }
 }

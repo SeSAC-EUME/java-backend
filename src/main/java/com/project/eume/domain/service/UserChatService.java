@@ -38,6 +38,7 @@ public class UserChatService {
         return userChatSearchService.findContentsByChatListId(chatListId, page, size);
     }
 
+    @Transactional
     public Mono<UserChatContentCreateResponse> sendMessage(
             String userEmail,
             Long chatListId,
@@ -49,6 +50,11 @@ public class UserChatService {
         // 2. 채팅 목록 조회 및 권한 확인
         UserChatList chatList = userChatSearchService.findById(chatListId);
         validateChatRoomAccess(chatList, user);
+
+        // 2-2. 채팅방 제목이 없으면 첫 메시지로 설정
+        if (chatList.getRoomTitle() == null || chatList.getRoomTitle().isBlank()) {
+            chatList.setRoomTitle(request.messageContent());
+        }
 
         String userMessage = request.messageContent();
 
