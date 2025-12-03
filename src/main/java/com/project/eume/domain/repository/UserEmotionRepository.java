@@ -66,7 +66,7 @@ public interface UserEmotionRepository extends JpaRepository<UserEmotion, Long> 
 
     /**
      * 감정 분포 통계를 SQL에서 직접 집계
-     * 반환: [totalWithData, safe, caution, highRisk, critical]
+     * 반환: List containing single Object[] = [totalWithData, safe, caution, highRisk, critical]
      */
     @Query("""
             SELECT
@@ -83,7 +83,7 @@ public interface UserEmotionRepository extends JpaRepository<UserEmotion, Long> 
                 AND e2.analysisDate BETWEEN :startDate AND :endDate
             )
             """)
-    Object[] getEmotionStatistics(
+    List<Object[]> getEmotionStatistics(
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate
     );

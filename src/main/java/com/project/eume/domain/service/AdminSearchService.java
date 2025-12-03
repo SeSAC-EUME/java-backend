@@ -203,13 +203,19 @@ public class AdminSearchService {
         }
 
         // 3. SQL에서 직접 감정 통계 집계 (단일 쿼리)
-        Object[] stats = userEmotionRepository.getEmotionStatistics(start, end);
+        List<Object[]> result = userEmotionRepository.getEmotionStatistics(start, end);
 
-        long usersWithData = stats[0] != null ? ((Number) stats[0]).longValue() : 0;
-        long safe = stats[1] != null ? ((Number) stats[1]).longValue() : 0;
-        long caution = stats[2] != null ? ((Number) stats[2]).longValue() : 0;
-        long highRisk = stats[3] != null ? ((Number) stats[3]).longValue() : 0;
-        long critical = stats[4] != null ? ((Number) stats[4]).longValue() : 0;
+        long usersWithData = 0, safe = 0, caution = 0, highRisk = 0, critical = 0;
+
+        if (!result.isEmpty()) {
+            Object[] stats = result.get(0);
+            usersWithData = stats[0] != null ? ((Number) stats[0]).longValue() : 0;
+            safe = stats[1] != null ? ((Number) stats[1]).longValue() : 0;
+            caution = stats[2] != null ? ((Number) stats[2]).longValue() : 0;
+            highRisk = stats[3] != null ? ((Number) stats[3]).longValue() : 0;
+            critical = stats[4] != null ? ((Number) stats[4]).longValue() : 0;
+        }
+
         long noData = totalUsers - usersWithData;
 
         return AdminEmotionStatisticsResponse.of(
