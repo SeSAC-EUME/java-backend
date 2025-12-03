@@ -49,7 +49,7 @@ public class EumeUser {
     @Column(nullable = false)
     private String userStatus;
 
-    @OneToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "sigungu_id")
     private Sigungu sigungu;
 
