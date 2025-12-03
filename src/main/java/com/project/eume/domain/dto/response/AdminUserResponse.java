@@ -2,6 +2,7 @@ package com.project.eume.domain.dto.response;
 
 import com.project.eume.domain.entity.EumeUser;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public record AdminUserResponse(
@@ -11,6 +12,8 @@ public record AdminUserResponse(
         String nickname,
         String userStatus,
         String sigunguName,
+        String profileImage,
+        LocalDate birthDate,
         LocalDateTime lastLoginDate,
         LocalDateTime createdAt
 ) {
@@ -26,6 +29,8 @@ public record AdminUserResponse(
                 user.getNickname(),
                 user.getUserStatus(),
                 sigunguName,
+                user.getProfileImage(),
+                user.getBirthDate(),
                 user.getLastLoginDate(),
                 user.getCreatedAt()
         );
