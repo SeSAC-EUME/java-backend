@@ -42,8 +42,16 @@ public record AdminUserEmotionResponse(
             return Collections.emptyList();
         }
 
+        String trimmed = keywordsJson.trim();
+
+        // JSON 배열이 아닌 경우 (숫자, 일반 문자열 등) 빈 리스트 반환
+        if (!trimmed.startsWith("[")) {
+            log.debug("Keywords is not a JSON array: {}", keywordsJson);
+            return Collections.emptyList();
+        }
+
         try {
-            return objectMapper.readValue(keywordsJson, new TypeReference<List<String>>() {});
+            return objectMapper.readValue(trimmed, new TypeReference<List<String>>() {});
         } catch (Exception e) {
             log.warn("Failed to parse keywords JSON: {}", keywordsJson, e);
             return Collections.emptyList();
