@@ -60,7 +60,7 @@ public class JwtUtil {
         claims.put(CODE_KEY, code);
         return buildJwt(
             claims,
-            jwtType.isAccessToken() ? accessTokenMaxAge : (accessTokenMaxAge * 30)
+            jwtType.isAccessToken() ? accessTokenMaxAge * 1000 : (accessTokenMaxAge * 30 * 1000)
         );
     }
 
