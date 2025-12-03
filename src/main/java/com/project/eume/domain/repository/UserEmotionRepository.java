@@ -63,4 +63,28 @@ public interface UserEmotionRepository extends JpaRepository<UserEmotion, Long> 
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate
     );
+
+    /**
+     * 감정 분포 통계를 SQL에서 직접 집계
+     * 반환: [totalWithData, safe, caution, highRisk, critical]
+     */
+    @Query("""
+            SELECT
+                COUNT(e),
+                SUM(CASE WHEN e.emotionScore >= 0 AND e.emotionScore <= 29 THEN 1 ELSE 0 END),
+                SUM(CASE WHEN e.emotionScore >= 30 AND e.emotionScore <= 59 THEN 1 ELSE 0 END),
+                SUM(CASE WHEN e.emotionScore >= 60 AND e.emotionScore <= 79 THEN 1 ELSE 0 END),
+                SUM(CASE WHEN e.emotionScore >= 80 THEN 1 ELSE 0 END)
+            FROM UserEmotion e
+            WHERE e.analysisDate BETWEEN :startDate AND :endDate
+            AND e.analysisDate = (
+                SELECT MAX(e2.analysisDate) FROM UserEmotion e2
+                WHERE e2.eumeUser.id = e.eumeUser.id
+                AND e2.analysisDate BETWEEN :startDate AND :endDate
+            )
+            """)
+    Object[] getEmotionStatistics(
+            @Param("startDate") LocalDateTime startDate,
+            @Param("endDate") LocalDateTime endDate
+    );
 }

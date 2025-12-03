@@ -1,5 +1,6 @@
 package com.project.eume.domain.service;
 
+import com.project.eume.domain.dto.response.AdminEmotionStatisticsResponse;
 import com.project.eume.domain.dto.response.AdminUserEmotionLatestResponse;
 import com.project.eume.domain.dto.response.AdminUserEmotionLatestResponse.UserWithLatestEmotion;
 import com.project.eume.domain.entity.EumeAdmin;
@@ -173,5 +174,47 @@ public class AdminSearchService {
             case "danger" -> score >= 60;
             default -> true;
         };
+    }
+
+    /**
+     * 감정 분포 통계 조회
+     * 감정 분포 차트를 위한 집계 데이터 반환
+     * SQL에서 직접 집계하여 효율적으로 처리
+     *
+     * @param startDate 조회 시작일
+     * @param endDate   조회 종료일
+     * @return 감정 분포 통계
+     */
+    public AdminEmotionStatisticsResponse getEmotionStatistics(LocalDate startDate, LocalDate endDate) {
+        // 1. 날짜 기본값 설정
+        LocalDate effectiveStartDate = startDate != null ? startDate : LocalDate.now().minusDays(7);
+        LocalDate effectiveEndDate = endDate != null ? endDate : LocalDate.now();
+
+        LocalDateTime start = effectiveStartDate.atStartOfDay();
+        LocalDateTime end = effectiveEndDate.atTime(LocalTime.MAX);
+
+        // 2. 전체 사용자 수 조회 (단순 count 쿼리)
+        long totalUsers = eumeUserRepository.count();
+
+        if (totalUsers == 0) {
+            return AdminEmotionStatisticsResponse.of(
+                    effectiveStartDate, effectiveEndDate, 0, 0, 0, 0, 0, 0
+            );
+        }
+
+        // 3. SQL에서 직접 감정 통계 집계 (단일 쿼리)
+        Object[] stats = userEmotionRepository.getEmotionStatistics(start, end);
+
+        long usersWithData = stats[0] != null ? ((Number) stats[0]).longValue() : 0;
+        long safe = stats[1] != null ? ((Number) stats[1]).longValue() : 0;
+        long caution = stats[2] != null ? ((Number) stats[2]).longValue() : 0;
+        long highRisk = stats[3] != null ? ((Number) stats[3]).longValue() : 0;
+        long critical = stats[4] != null ? ((Number) stats[4]).longValue() : 0;
+        long noData = totalUsers - usersWithData;
+
+        return AdminEmotionStatisticsResponse.of(
+                effectiveStartDate, effectiveEndDate, totalUsers,
+                safe, caution, highRisk, critical, noData
+        );
     }
 }

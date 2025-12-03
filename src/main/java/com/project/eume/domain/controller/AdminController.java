@@ -208,6 +208,21 @@ public class AdminController {
         return ResponseEntity.ok(AdminUserEmotionListResponse.from(emotions));
     }
 
+    @GetMapping("/emotions/statistics")
+    @Operation(summary = "감정 분포 통계 조회",
+            description = "모든 사용자의 감정 분포 통계를 조회합니다. 감정 분포 차트를 위한 집계 데이터를 반환합니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "401", description = "인증 실패 (JWT 토큰 없음 또는 유효하지 않음)")
+    })
+    public ResponseEntity<AdminEmotionStatisticsResponse> getEmotionStatistics(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+    ) {
+        AdminEmotionStatisticsResponse response = adminSearchService.getEmotionStatistics(startDate, endDate);
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping("/reports/summary")
     @Operation(summary = "보고서 요약 조회", description = "기간별 이용자 활동, AI 대화, 감정 분석 등 요약 데이터를 조회합니다.")
     @ApiResponses(value = {
