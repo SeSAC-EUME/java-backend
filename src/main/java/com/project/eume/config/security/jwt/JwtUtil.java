@@ -46,6 +46,25 @@ public class JwtUtil {
     }
 
     /**
+     * jwt를 생성하여 반환하는 메서드
+     *
+     * @param username          유저의 email
+     * @param code              토큰의 세트를 구분하기 위한 값. 여러 기기에서의 동시 로그인을 위함 (하나의 refreshToken은 하나 이상의 accessToken과 연결)
+     * @param jwtType           jwt 토큰 유형
+     * @param accessTokenMaxAge 액세스 토큰의 최대 수명 (초 단위)
+     * @return 유저의 jwt
+     */
+    public String generateAdminJwt(String username, String code, JwtType jwtType, int accessTokenMaxAge) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put(USERNAME_KEY, username);
+        claims.put(CODE_KEY, code);
+        return buildJwt(
+            claims,
+            jwtType.isAccessToken() ? accessTokenMaxAge : (accessTokenMaxAge * 30)
+        );
+    }
+
+    /**
      * 테스트용 만료된 jwt를 생성하여 반환하는 메서드
      * ⚠️ 테스트 환경에서만 사용 - 프로덕션에서는 사용하지 말 것
      *

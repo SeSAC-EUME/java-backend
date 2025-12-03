@@ -45,7 +45,7 @@ public class EumeAdmin {
     @Column
     private String adminStatus;
 
-    @OneToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "sigungu_id")
     private Sigungu sigungu;
 

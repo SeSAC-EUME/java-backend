@@ -68,7 +68,7 @@ public class AdminService {
 
         // 7. JWT 토큰 생성 및 쿠키 설정
         String code = UUID.randomUUID().toString();
-        String accessToken = jwtUtil.generateJwt(admin.getAdminLoginId(), code, JwtType.ACCESS_TOKEN);
+        String accessToken = jwtUtil.generateAdminJwt(admin.getAdminLoginId(), code, JwtType.ACCESS_TOKEN, ACCESS_TOKEN_MAX_AGE);
 
         addTokenCookie(response, JwtRule.ADMIN_ACCESS_PREFIX.getValue(), accessToken, ACCESS_TOKEN_MAX_AGE);
 
