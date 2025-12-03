@@ -141,6 +141,26 @@ public class AdminController {
                 .body(new ByteArrayResource(excelData));
     }
 
+    @GetMapping("/users/emotions/latest")
+    @Operation(summary = "모든 사용자의 최근 감정 데이터 조회",
+            description = "모든 사용자의 최근 감정 분석 데이터를 한 번에 조회합니다. N+1 문제를 해결하기 위한 최적화된 API입니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "조회 성공"),
+            @ApiResponse(responseCode = "401", description = "인증 실패 (JWT 토큰 없음 또는 유효하지 않음)")
+    })
+    public ResponseEntity<AdminUserEmotionLatestResponse> getUsersWithLatestEmotion(
+            @RequestParam(defaultValue = "0") @Min(0) int page,
+            @RequestParam(defaultValue = "20") @Min(1) int size,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @RequestParam(defaultValue = "all") String emotionLevel
+    ) {
+        AdminUserEmotionLatestResponse response = adminSearchService.findUsersWithLatestEmotion(
+                page, size, startDate, endDate, emotionLevel
+        );
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping("/users/{userId}")
     @Operation(summary = "사용자 상세 조회", description = "특정 사용자의 상세 정보를 조회합니다.")
     @ApiResponses(value = {
